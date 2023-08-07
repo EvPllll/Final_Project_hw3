@@ -248,15 +248,15 @@ with DAG(
     # )
     task_2 = PythonOperator(
         task_id='get_data_with_file',
-        python_callable=get_data_with_file
+        python_callable=get_data_with_file,
     )
     task_3 = PythonOperator(
         task_id='get_data_with_hh',
-        python_callable=get_data_with_hh
+        python_callable=get_data_with_hh,
     )
     task_4 = PythonOperator(
         task_id='get_top_key_skills',
-        python_callable=get_top_key_skills
+        python_callable=get_top_key_skills,
     )
 
     task_2 >> task_3 >> task_4
