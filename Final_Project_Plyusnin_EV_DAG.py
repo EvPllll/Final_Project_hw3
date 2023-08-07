@@ -205,7 +205,7 @@ def get_data_with_hh() -> None:
                         return
 
             except ValueError:
-                logging.debug('не удалось осуществить запись :(')
+                logger.debug(f'не удалось осуществить запись данных.')
                 continue
 
     logger = logging.getLogger(__name__)
@@ -234,6 +234,7 @@ def get_top_key_skills() -> None:
         logger.info(f'ТОП скиллов сформирован: {sorted(top.items(), key=lambda x: x[1], reverse=True)}')
 
 
+# Создаём, непосредственно, поток работ
 with DAG(
     dag_id='Plyusnin_EV_hw3',
     default_args=default_args,
