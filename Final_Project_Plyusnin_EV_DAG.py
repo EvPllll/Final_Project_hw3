@@ -15,7 +15,6 @@ from collections import Counter
 import requests
 
 from aiohttp import TCPConnector, ClientSession
-
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
