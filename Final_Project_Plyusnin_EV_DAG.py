@@ -16,7 +16,7 @@ import requests
 
 from aiohttp import TCPConnector, ClientSession
 from airflow import DAG
-from airflow.operators.bash import BashOperator
+# from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.sqlite.hooks.sqlite import SqliteHook
 
@@ -29,7 +29,7 @@ default_args = {
 
 # Bash команда для скачивания архива
 bash_command = "wget https://ofdata.ru/open-data/download/egrul.json.zip -O " \
-             "/home/rtstudent/students/Plyusnin_EV/egrul.json.zip"
+               "/home/rtstudent/students/Plyusnin_EV/egrul.json.zip"
 
 
 def get_data_with_file() -> None:
@@ -242,10 +242,10 @@ with DAG(
     start_date=datetime(2023, 8, 8, 8),
     schedule_interval='@daily'
 ) as dag:
-    task_1 = BashOperator(
-        task_id='download_file',
-        bash_command=bash_command
-    )
+    # task_1 = BashOperator(
+    #     task_id='download_file',
+    #     bash_command=bash_command
+    # )
     task_2 = PythonOperator(
         task_id='get_data_with_file',
         python_callable=get_data_with_file
@@ -259,4 +259,4 @@ with DAG(
         python_callable=get_top_key_skills
     )
 
-    task_1 >> task_2 >> task_3 >> task_4
+    task_2 >> task_3 >> task_4
