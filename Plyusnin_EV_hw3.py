@@ -16,7 +16,7 @@ import requests
 
 from aiohttp import TCPConnector, ClientSession
 from airflow import DAG
-# from airflow.operators.bash import BashOperator
+# from airflow.operators.bash import BashOperator - закоменчено, т.к. в данном случае не используется.
 from airflow.operators.python import PythonOperator
 from airflow.providers.sqlite.operators.sqlite import SqliteOperator
 from airflow.providers.sqlite.hooks.sqlite import SqliteHook
@@ -41,7 +41,7 @@ def get_data_with_file() -> None:
     logger = logging.getLogger(__name__)
 
     logger.info('Пытаюсь соединиться с БД...')
-    sqlite_hook = SqliteHook(sqlite_get_conn='Plyusnin_EV')
+    sqlite_hook = SqliteHook(sqlite_get_conn='sqlite_default')
     logger.info('Соединение с БД успешно!')
 
     # Использовал файл, который предварительно закачан на ВМ
@@ -212,7 +212,7 @@ def get_data_with_hh() -> None:
     logger = logging.getLogger(__name__)
 
     logger.info('Пытаюсь соединиться с БД...')
-    sqlite_hook = SqliteHook(sqlite_get_conn='Plyusnin_EV')
+    sqlite_hook = SqliteHook(sqlite_get_conn='sqlite_default')
     logger.info('Соединение с БД успешно!')
 
     # Осуществляем поиск ID
@@ -237,28 +237,34 @@ def get_top_key_skills() -> None:
 
 # Создаём, непосредственно, поток работ
 with DAG(
-    dag_id='Plyusnin_final_product',
+    dag_id='Plyusnin_E.V._DAG_hw3',
     default_args=default_args,
     description='DAG for third homework',
     start_date=datetime(2023, 8, 1),
     schedule_interval='@daily'
 ) as dag:
+
+    # Закоментил bash-команду т.к. архив ОКВЭД уже имеется в каталоге.
     # download_file = BashOperator(
     #     task_id='download_file',
     #     bash_command=bash_command
     # )
+
+    # создание таблицы telecom companies в БД
     create_table_for_okved = SqliteOperator(
         task_id='create_table_for_okved',
-        sqlite_conn_id='Plyusnin_EV.db',
+        sqlite_conn_id='sqlite_default',
         sql='''CREATE TABLE IF NOT EXISTS telecom_companies (okved varchar,
                                                              inn bigint,
                                                              full_name varchar,
                                                              kpp bigint);'''
     )
+
+    # создание таблицы vacancies в БД
     create_table_for_vacancies = SqliteOperator(
         task_id='create_table_for_vacancies',
-        sqlite_conn_id='Plyusnin_EV.db',
-        sql='''CREATE TABLE IF NOT EXISTS {table_name} (company_name varchar,
+        sqlite_conn_id='sqlite_default',
+        sql='''CREATE TABLE IF NOT EXISTS vacancies (company_name varchar,
                                                         position varchar,
                                                         job_description text,
                                                         key_skills varchar);'''
@@ -276,5 +282,9 @@ with DAG(
         python_callable=get_top_key_skills,
     )
 
+    # Следовало бы еще сделать task, который чистит файл key_skills.txt для того, что бы данные при каждом запуске
+    # потока не складывались в топ - он получается неверен, но свою основную функцию выполняет.
+
+    # Формируем граф
     [create_table_for_okved, create_table_for_vacancies] >> get_okved_data >> get_vacancy_data >> get_top_skills
 
